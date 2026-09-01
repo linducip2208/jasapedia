@@ -114,6 +114,30 @@ use Illuminate\Support\Facades\Route;
             Route::post('/worklogs', [\App\Http\Controllers\Api\V1\Partner\DealController::class, 'storeWorkLog'])->name('partner.deals.worklogs');
         });
 
+        // Reviews (customer)
+        Route::middleware(['auth:sanctum', 'permission:customer.order.review'])->prefix('orders')->group(function (): void {
+            Route::post('/{id}/review', [\App\Http\Controllers\Api\V1\Customer\ReviewController::class, 'store'])->name('orders.review');
+        });
+        Route::get('/partners/{partnerId}/reviews', [\App\Http\Controllers\Api\V1\Customer\ReviewController::class, 'partnerReviews'])->name('partners.reviews');
+
+        // Partner review response
+        Route::middleware(['auth:sanctum', 'permission:partner.review.respond'])->post('/reviews/{id}/respond', [\App\Http\Controllers\Api\V1\Customer\ReviewController::class, 'respond'])->name('reviews.respond');
+
+        // Warranty (customer)
+        Route::middleware(['auth:sanctum', 'permission:customer.warranty.claim'])->post('/orders/{id}/warranty-claims', [\App\Http\Controllers\Api\V1\Customer\ReviewController::class, 'warrantyClaim'])->name('orders.warranty-claim');
+
+        // Disputes (customer/partner)
+        Route::middleware('auth:sanctum')->prefix('disputes')->group(function (): void {
+            Route::post('/orders/{orderId}', [\App\Http\Controllers\Api\V1\Customer\ReviewController::class, 'openDispute'])->name('disputes.open');
+            Route::post('/{id}/evidence', [\App\Http\Controllers\Api\V1\Customer\ReviewController::class, 'addEvidence'])->name('disputes.evidence');
+        });
+
+        // KYC submission (partner)
+        Route::middleware('auth:sanctum')->post('/partner/kyc-submit', [\App\Http\Controllers\Api\V1\Customer\ReviewController::class, 'kycSubmit'])->name('partner.kyc-submit');
+
+        // Admin dispute resolution (DisputeOfficer)
+        Route::middleware(['auth:sanctum', 'permission:dispute.resolve'])->post('/admin/disputes', [\App\Http\Controllers\Api\V1\Admin\DisputeAdminController::class, 'resolve'])->name('admin.disputes.resolve');
+
         // Partner services management
         Route::middleware(['auth:sanctum', 'permission:partner.service.manage'])->prefix('partner/services')->group(function (): void {
             Route::get('/', [CatalogController::class, 'myServices'])->name('partner.services.index');

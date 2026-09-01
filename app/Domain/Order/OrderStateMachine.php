@@ -37,7 +37,7 @@ final class OrderStateMachine
         'expired' => [],
         'cancelled' => [],
         'closed' => [],
-        'disputed' => [], // resolved transitions handled by dispute module (restore/refund/settle)
+        'disputed' => ['refund_pending', 'settlement_pending'], // restore-from-snapshot handled by dispute module
     ];
 
     public function allowedNext(Order $order): array
