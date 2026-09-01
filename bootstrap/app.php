@@ -22,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Security headers (doc 14 §111)
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+
+        // Guest users hitting auth-only web routes → login page
+        $middleware->redirectGuestsTo(fn () => route('login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

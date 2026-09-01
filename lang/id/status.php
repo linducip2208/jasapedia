@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'draft' => 'Draf',
+    'pending_payment' => 'Menunggu Pembayaran',
+    'paid' => 'Dibayar',
+    'searching_provider' => 'Mencari Provider',
+    'offered' => 'Menunggu Konfirmasi Provider',
+    'accepted' => 'Diterima Provider',
+    'assigned' => 'Teknisi Ditugaskan',
+    'on_the_way' => 'Menuju Lokasi',
+    'arrived' => 'Teknisi Tiba',
+    'checked_in' => 'Check-in',
+    'working' => 'Sedang Dikerjakan',
+    'awaiting_customer_confirmation' => 'Menunggu Konfirmasi Anda',
+    'completed' => 'Selesai',
+    'settlement_pending' => 'Menunggu Settlement',
+    'settled' => 'Settled',
+    'closed' => 'Ditutup',
+    'cancelled' => 'Dibatalkan',
+    'expired' => 'Kedaluwarsa',
+    'failed' => 'Gagal',
+    'disputed' => 'Sengketa',
+    'rework_required' => 'Perlu Perbaikan',
+    'refund_pending' => 'Refund Diproses',
+    'partially_refunded' => 'Sebagian Dikembalikan',
+    'refunded' => 'Dana Dikembalikan',
+];
