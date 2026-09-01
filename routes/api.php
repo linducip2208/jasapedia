@@ -160,6 +160,33 @@ use Illuminate\Support\Facades\Route;
             Route::post('/tickets/{id}/reply', [\App\Http\Controllers\Api\V1\SupportController::class, 'reply'])->name('support.reply');
         });
 
+        // RFQ (customer buyer)
+        Route::middleware(['auth:sanctum', 'permission:customer.project.manage'])->prefix('rfqs')->group(function (): void {
+            Route::post('/', [\App\Http\Controllers\Api\V1\Customer\RfqController::class, 'store'])->name('rfqs.store');
+            Route::get('/', [\App\Http\Controllers\Api\V1\Customer\RfqController::class, 'index'])->name('rfqs.index');
+            Route::post('/{id}/close', [\App\Http\Controllers\Api\V1\Customer\RfqController::class, 'close'])->name('rfqs.close');
+            Route::post('/quotations/{quotationId}/approve', [\App\Http\Controllers\Api\V1\Customer\RfqController::class, 'approveQuotation'])->name('rfqs.quotation-approve');
+        });
+
+        // RFQ (partner quoting)
+        Route::middleware(['auth:sanctum', 'permission:vendor.quotation.submit'])->prefix('partner/rfqs')->group(function (): void {
+            Route::get('/', [\App\Http\Controllers\Api\V1\Partner\DealController::class, 'openRfqs'])->name('partner.rfqs.open');
+            Route::post('/quotations', [\App\Http\Controllers\Api\V1\Partner\DealController::class, 'submitQuotation'])->name('partner.rfqs.quote');
+            Route::post('/quotations/{quotationId}/revise', [\App\Http\Controllers\Api\V1\Partner\DealController::class, 'reviseQuotation'])->name('partner.rfqs.revise');
+            Route::get('/quotations', [\App\Http\Controllers\Api\V1\Partner\DealController::class, 'myQuotations'])->name('partner.rfqs.my-quotes');
+        });
+
+        // Corporate (B2B)
+        Route::middleware('auth:sanctum')->prefix('corporate')->group(function (): void {
+            Route::post('/organizations', [\App\Http\Controllers\Api\V1\Customer\CorporateController::class, 'createOrg'])->name('corporate.org-create');
+            Route::post('/organizations/{orgId}/employees', [\App\Http\Controllers\Api\V1\Customer\CorporateController::class, 'addEmployee'])->name('corporate.employee-add');
+            Route::post('/organizations/{orgId}/approval-policy', [\App\Http\Controllers\Api\V1\Customer\CorporateController::class, 'setPolicy'])->name('corporate.policy');
+            Route::post('/service-requests', [\App\Http\Controllers\Api\V1\Customer\CorporateController::class, 'createRequest'])->name('corporate.request-create');
+            Route::post('/service-requests/{id}/approve', [\App\Http\Controllers\Api\V1\Customer\CorporateController::class, 'approve'])->name('corporate.approve');
+            Route::post('/service-requests/{id}/convert', [\App\Http\Controllers\Api\V1\Customer\CorporateController::class, 'convertToOrder'])->name('corporate.convert');
+            Route::get('/service-requests', [\App\Http\Controllers\Api\V1\Customer\CorporateController::class, 'myRequests'])->name('corporate.requests');
+        });
+
         // Partner services management
         Route::middleware(['auth:sanctum', 'permission:partner.service.manage'])->prefix('partner/services')->group(function (): void {
             Route::get('/', [CatalogController::class, 'myServices'])->name('partner.services.index');

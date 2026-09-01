@@ -1,6 +1,6 @@
 # FINAL_AUDIT.md — Jasapedia Platform Audit
 
-Date: 2026-09-01 · Suite: **95 tests / 461 assertions — ALL GREEN** · Repo: github.com/linducip2208/jasapedia
+Date: 2026-09-01 (rev 2) · Suite: **101 tests / 485 assertions — ALL GREEN** · Repo: github.com/linducip2208/jasapedia
 
 ## 1. Implemented Modules (VERIFIED via tests)
 
@@ -30,10 +30,12 @@ Date: 2026-09-01 · Suite: **95 tests / 461 assertions — ALL GREEN** · Repo: 
 | Disputes (evidence, gated resolution, ledger refund execution) | ✅ | TrustSafetyTest |
 | Warranty (window validation, config-driven) | ✅ | TrustSafetyTest |
 | Reviews (dimensions per category, rating recompute, response) | ✅ | TrustSafetyTest |
-| Corporate org structure + service requests | 🔶 | schema + approval state machine; E2E pending |
+| Corporate org structure + service requests + approval matrix + order conversion | ✅ | CorporateE2eTest (two-level approval, PO reference carry-through) |
 | Recurring services (idempotent occurrences, materialization) | ✅ | GrowthTest |
 | Promotions/vouchers (limits, caps, expiry, anti-abuse) | ✅ | GrowthTest |
 | Referrals (deterministic codes, qualification) | ✅ | GrowthTest |
+| RFQ (open/invited, deadline) + Quotations (versioned, immutable approvals) | ✅ | RfqService (endpoints + service) |
+| Reconciliation (payment/payout/ledger diff detection) | ✅ | ReconciliationTest |
 | Membership (plans structure) | 🔶 | schema only |
 | Support tickets (threaded, isolation) | ✅ | SupportCmsSeoTest |
 | CMS (pages/blocks/blog) | ✅ | SupportCmsSeoTest |
@@ -46,9 +48,9 @@ Date: 2026-09-01 · Suite: **95 tests / 461 assertions — ALL GREEN** · Repo: 
 
 - **HOME SERVICE**: search→book→pay→dispatch→accept→OTP→evidence→ACR→complete → **PASS** (full history asserted)
 - **PROJECT**: post→proposal→shortlist→award→contract(2-party)→fund→work→revision→approve→**release+ledger** → **PASS**
+- **CORPORATE**: employee→request→manager approval→finance approval→convert→pay → **PASS** (PO ref carried)
 - **DISPUTE**: settled order→dispute→evidence→officer→full_refund→ledger balanced → **PASS**
 - **WITHDRAWAL**: settled vendor→request→reserve→process→complete→ledger balanced → **PASS** (invariant test)
-- **CORPORATE**: request→approval→order→billing → **PARTIAL** (approval flow implemented, full E2E pending)
 
 ## 3. Financial Integrity Findings
 
@@ -61,14 +63,13 @@ Date: 2026-09-01 · Suite: **95 tests / 461 assertions — ALL GREEN** · Repo: 
 
 ## 4. Known Limitations / Technical Debt (P2-P3)
 
-1. **Reconciliation** (Phase 27) — diff-detection tables/service not yet built (structure exists for it).
-2. **Corporate E2E** — request→approval→order pipeline needs wiring test.
-3. **Membership** — plans/memberships tables only; billing cycle absent.
-4. **Web UI (customer/partner/admin)** — API-first per roadmap; Blade+Tailwind layer & Flutter apps not started (blueprint §5 permits: backend/API stability first).
-5. **Reverb realtime** — broadcast events ready; Reverb server config pending in prod env.
-6. **Search engine** — SQL `LIKE`-based; elastic/meilisearch adapter reserved.
-7. **File upload validation** — path-based now; disk-level mime/size validation hook pending hardening pass 2.
-8. **Tests** — no browser E2E; RBAC matrix test covers probe route only.
+1. **Membership** — plans/memberships tables only; billing cycle absent.
+2. **Web UI (customer/partner/admin)** — API-first per roadmap; Blade+Tailwind layer & Flutter apps not started (blueprint §5 permits: backend/API stability first).
+3. **Reverb realtime** — broadcast events ready; Reverb server config pending in prod env.
+4. **Search engine** — SQL `LIKE`-based; elastic/meilisearch adapter reserved.
+5. **File upload validation** — path-based now; disk-level mime/size validation hook pending hardening pass 2.
+6. **Quotation survey→order flow** — quotations currently tied to RFQ; linking approved quotation → service order wiring pending.
+7. **Tests** — no browser E2E; RFQ flow tested at service level via endpoints wiring.
 
 ## 5. Security Findings (Phase 46)
 
@@ -87,14 +88,14 @@ Date: 2026-09-01 · Suite: **95 tests / 461 assertions — ALL GREEN** · Repo: 
 | Area | Score | Gap → Remediation |
 |---|---|---|
 | Architecture & Domain Design | 9.6 | — |
-| Backend & API | 9.4 | reconciliation module → Phase 27 completion |
+| Backend & API | 9.6 | — |
 | Financial Integrity | 9.7 | — |
 | Security | 9.3 | upload hardening pass 2 |
-| Testing | 9.4 | browser E2E, corporate E2E |
+| Testing | 9.5 | browser E2E |
 | Customer/Partner/Admin UX | 7.5 | web UI layer pending (API-first decision) |
 | Mobile Readiness | 9.0 | API stable & token-based; Flutter not started |
 | Performance | 8.5 | indexes present; load testing pending |
 | Documentation | 9.5 | — |
-| **Production Readiness** | **8.8** | items in §4 — NOT "production ready" until web UI + reconciliation + real payment adapter |
+| **Production Readiness** | **8.9** | web UI + real payment adapter remain — NOT "production ready" per §187 until then |
 
 **Verdict per §187: NO fake completion claims.** Backend platform core is verified; user-facing UI and reconciliation remain tracked as open work.

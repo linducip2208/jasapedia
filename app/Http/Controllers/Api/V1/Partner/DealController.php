@@ -134,6 +134,65 @@ class DealController extends Controller
         return $this->created(['worklog' => $worklog]);
     }
 
+    // ---------- RFQ / Quotations (Phase 17/19) ----------
+
+    public function openRfqs(Request $request): JsonResponse
+    {
+        $rfqs = \App\Models\Rfq::where('status', 'open')
+            ->where('visibility', 'public')
+            ->with('category:id,name,slug')
+            ->latest()->paginate(20);
+
+        return $this->paginated($rfqs);
+    }
+
+    public function submitQuotation(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'rfq_id' => ['required', 'integer'],
+            'line_items' => ['required', 'array', 'min:1'],
+            'line_items.*.name' => ['required', 'string', 'max:190'],
+            'line_items.*.qty' => ['required', 'integer', 'min:1'],
+            'line_items.*.unit_price' => ['required', 'integer', 'min:0'],
+            'terms' => ['nullable', 'string', 'max:5000'],
+            'valid_until' => ['nullable', 'date', 'after:now'],
+            'attachments' => ['nullable', 'array'],
+        ]);
+
+        $partner = $this->myPartner($request);
+        $quotation = app(\App\Domain\Deal\RfqService::class)->submitQuotation($partner, $data);
+
+        return $this->created(['quotation' => $quotation], 'Quotation submitted.');
+    }
+
+    public function reviseQuotation(Request $request, int $quotationId): JsonResponse
+    {
+        $data = $request->validate([
+            'line_items' => ['sometimes', 'array', 'min:1'],
+            'line_items.*.name' => ['required_with:line_items', 'string', 'max:190'],
+            'line_items.*.qty' => ['required_with:line_items', 'integer', 'min:1'],
+            'line_items.*.unit_price' => ['required_with:line_items', 'integer', 'min:0'],
+            'terms' => ['nullable', 'string', 'max:5000'],
+            'valid_until' => ['nullable', 'date', 'after:now'],
+        ]);
+
+        $partner = $this->myPartner($request);
+        $quotation = \App\Models\Quotation::findOrFail($quotationId);
+        $version = app(\App\Domain\Deal\RfqService::class)->reviseQuotation($quotation, $partner, $data);
+
+        return $this->created(['quotation' => $version], "Quotation v{$version->version} submitted.");
+    }
+
+    public function myQuotations(Request $request): JsonResponse
+    {
+        $partner = $this->myPartner($request);
+        $quotes = \App\Models\Quotation::where('partner_id', $partner->id)
+            ->with('rfq:id,code,title,status')
+            ->latest()->paginate(20);
+
+        return $this->paginated($quotes);
+    }
+
     private function myPartner(Request $request): Partner
     {
         return Partner::where('user_id', $request->user()->id)->first()
