@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 80" role="img" aria-label="Jasapedia">
+  <g transform="translate(0,-6) scale(0.16)">
+    <rect width="512" height="512" rx="120" fill="#0D9488"/>
+    <g fill="none" stroke="#FFFFFF" stroke-width="34" stroke-linecap="round">
+      <path d="M256 132 a124 124 0 0 1 107.4 62"/>
+      <path d="M363.4 194 a124 124 0 0 1 0 124"/>
+      <path d="M363.4 318 a124 124 0 0 1 -214.8 0"/>
+      <path d="M148.6 318 a124 124 0 0 1 0 -124"/>
+      <path d="M148.6 194 a124 124 0 0 1 62.6 -56.7"/>
+    </g>
+    <circle cx="256" cy="256" r="52" fill="#F59E0B"/>
+  </g>
+  <text x="92" y="56" font-family="ui-sans-serif, system-ui, 'Segoe UI', Arial, sans-serif" font-size="40" font-weight="700" fill="#0F172A">Jasapedia</text>
+</svg>

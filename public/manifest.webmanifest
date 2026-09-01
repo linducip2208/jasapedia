@@ -1,0 +1,36 @@
+{
+    "name": "Jasapedia — Semua Jasa, Satu Platform",
+    "short_name": "Jasapedia",
+    "description": "Marketplace jasa terlengkap Indonesia: servis rumah, teknisi, freelancer, proyek, dan kebutuhan perusahaan.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0D9488",
+    "theme_color": "#0D9488",
+    "lang": "id",
+    "icons": [
+        {
+            "src": "/branding/favicon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/branding/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Jelajahi Jasa",
+            "url": "/explore",
+            "icons": [{ "src": "/branding/favicon-192x192.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Pesanan Saya",
+            "url": "/orders",
+            "icons": [{ "src": "/branding/favicon-192x192.png", "sizes": "192x192" }]
+        }
+    ]
+}

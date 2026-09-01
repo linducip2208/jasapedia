@@ -49,6 +49,11 @@ class Service extends Model
         return $this->hasMany(ServiceAddon::class);
     }
 
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(User::class, 'favorites', 'service_id', 'user_id');
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('services.status', 'active')

@@ -16,6 +16,20 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Support\Audit\AuditLogger::class);
         $this->app->singleton(\App\Domain\Authorization\PermissionRegistrar::class);
 
+        // Search engine abstraction — SEARCH_DRIVER=sql|meilisearch (ADR: no direct engine coupling)
+        $this->app->bind(\App\Domain\Search\SearchProviderInterface::class, function () {
+            if (config('services.search.driver') === 'meilisearch') {
+                $meili = \App\Domain\Search\MeilisearchSearchProvider::fromConfig();
+                if ($meili) {
+                    return $meili;
+                }
+            }
+
+            return new \App\Domain\Search\SqlSearchProvider;
+        });
+
+        $this->app->bind(\App\Domain\Location\GeoServiceInterface::class, \App\Domain\Location\GeoService::class);
+
         $this->app->singleton(\App\Domain\Payment\Contracts\PaymentGatewayInterface::class, function () {
             $driver = config('services.payments.driver', 'sandbox');
 
@@ -23,6 +37,8 @@ class AppServiceProvider extends ServiceProvider
                 'sandbox' => new \App\Domain\Payment\Gateways\SandboxGateway(
                     config('services.payments.sandbox_secret', 'sandbox-secret'),
                 ),
+                'xendit' => \App\Domain\Payment\Gateways\XenditPaymentGateway::fromConfig(),
+                'midtrans' => \App\Domain\Payment\Gateways\MidtransPaymentGateway::fromConfig(),
                 default => throw new \RuntimeException("Payment driver [{$driver}] not configured. Register its adapter."),
             };
         });

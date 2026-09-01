@@ -194,4 +194,19 @@ class WebController extends Controller
 
         return view('web.page', ['page' => $page]);
     }
+
+    public function blogIndex()
+    {
+        $posts = \App\Models\BlogPost::where('status', 'published')
+            ->orderByDesc('published_at')->paginate(12);
+
+        return view('web.blog.index', ['posts' => $posts]);
+    }
+
+    public function blogShow(string $slug)
+    {
+        $post = \App\Models\BlogPost::where('slug', $slug)->where('status', 'published')->firstOrFail();
+
+        return view('web.blog.show', ['post' => $post]);
+    }
 }

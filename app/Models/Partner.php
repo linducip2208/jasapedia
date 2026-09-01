@@ -58,6 +58,11 @@ class Partner extends Model
         return $this->hasMany(Service::class);
     }
 
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(User::class, 'favorites', 'partner_id', 'user_id');
+    }
+
     public function isVendorCompany(): bool
     {
         return $this->type === 'vendor_company';
