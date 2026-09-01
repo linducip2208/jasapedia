@@ -26,6 +26,21 @@ class AppServiceProvider extends ServiceProvider
                 default => throw new \RuntimeException("Payment driver [{$driver}] not configured. Register its adapter."),
             };
         });
+
+        // AI provider — optional; null = rule-based fallbacks (ADR-010)
+        $this->app->singleton(\App\Domain\Ai\AiManager::class, function () {
+            $driver = config('services.ai.driver');
+
+            $provider = null;
+            if ($driver && class_exists($driver)) {
+                $provider = app($driver);
+                if (! $provider instanceof \App\Domain\Ai\AiProviderInterface) {
+                    $provider = null;
+                }
+            }
+
+            return new \App\Domain\Ai\AiManager($provider);
+        });
     }
 
     public function boot(): void

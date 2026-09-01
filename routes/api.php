@@ -138,6 +138,13 @@ use Illuminate\Support\Facades\Route;
         // Admin dispute resolution (DisputeOfficer)
         Route::middleware(['auth:sanctum', 'permission:dispute.resolve'])->post('/admin/disputes', [\App\Http\Controllers\Api\V1\Admin\DisputeAdminController::class, 'resolve'])->name('admin.disputes.resolve');
 
+        // AI assistance (advisory only — degrades to rule-based)
+        Route::middleware('auth:sanctum')->prefix('ai')->group(function (): void {
+            Route::post('/find-service', [\App\Http\Controllers\Api\V1\AiAssistantController::class, 'findService'])->name('ai.find-service');
+            Route::post('/build-brief', [\App\Http\Controllers\Api\V1\AiAssistantController::class, 'buildBrief'])->name('ai.build-brief');
+            Route::post('/conversations/{conversationId}/summary', [\App\Http\Controllers\Api\V1\AiAssistantController::class, 'summarizeConversation'])->name('ai.summary');
+        });
+
         // Support / CMS / SEO (public + customer)
         Route::get('/cms/blocks', [\App\Http\Controllers\Api\V1\CmsController::class, 'homepageBlocks'])->name('cms.blocks');
         Route::get('/cms/pages/{slug}', [\App\Http\Controllers\Api\V1\CmsController::class, 'page'])->name('cms.page');

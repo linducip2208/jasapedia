@@ -22,15 +22,15 @@ Legend: ✅ done · 🔶 partial · ⬜ pending. Money = integer IDR. Never fake
 | 13 Field Service | ✅ | OTP check-in, before/after evidence, materials, structured AdditionalChargeRequest (24h TTL), worker-only guards. **Critical E2E §126 passes** |
 | 14 Chat | ✅ | Conversations (direct/order contexts), idempotent sends (client_message_id), read receipts, contact-share warnings, reports, broadcast events + poll fallback |
 | 15 Notifications | ✅ | In-app notifications, unread counts, per-event channel preferences, critical-event policy, adapter interface |
-| 16–21 Project/RFQ/Proposal/Quotation/Contract/Milestone | ⬜ | |
-| 22–27 Ledger/Commission/Settlement/Withdrawal/Refund/Reconciliation | 🔶 | Ledger (balanced, reversal-only), Commission snapshot (immutable), Settlement (double-guard), Withdrawal (reservation+race-safe), Refund (eligibility+lock) — all invariant-tested (§54/§128) green. Reconciliation pending |
-| 28–32 KYC/T&S/Dispute/Warranty/Reviews | ⬜ | |
-| 33–37 Corporate/Recurring/Promo/Referral/Membership | ⬜ | |
-| 38–40 Support/CMS/SEO | ⬜ | |
-| 41–43 Command Centers/Analytics | ⬜ | |
-| 44–45 AI | ⬜ | |
-| 46 Hardening | ⬜ | |
-| 47 Full E2E | ⬜ | |
-| 48 UI Polish | ⬜ | |
-| 49 Prod Readiness | ⬜ | |
-| 50 Final Audit | ⬜ | |
+| 16–21 Project/RFQ/Proposal/Quotation/Contract/Milestone | 🔶 | Project→Proposal→Award→Contract(versioned)→Milestone(fund/approve/release) **E2E §127 PASS**; RFQ table + quotation versioning schema ready, service wiring pending |
+| 22–27 Ledger/Commission/Settlement/Withdrawal/Refund/Reconciliation | 🔶 | Ledger/Commission/Settlement/Withdrawal/Refund **invariants PASS (§54/§128)**; Reconciliation diff-detection pending |
+| 28–32 KYC/T&S/Dispute/Warranty/Reviews | ✅ | KYC submit+decisions, disputes w/ ledger refunds, warranty window, reviews+dimensions. Full E2E dispute PASS |
+| 33–37 Corporate/Recurring/Promo/Referral/Membership | 🔶 | Recurring/Promo/Referral PASS; corporate schema+requests done (E2E pending); membership schema only |
+| 38–40 Support/CMS/SEO | ✅ | Tickets threaded, CMS pages/blocks/blog, SEO landing /jasa/{cat}/{city} |
+| 41–43 Command Centers/Analytics | ⬜ | Data layer ready (orders/settlements/ledger); dashboards pending (web UI) |
+| 44–45 AI | ✅ | AiManager + advisory-only endpoints, graceful degradation, tests |
+| 46 Hardening | ✅ | Security headers, rate limits, error envelope, authz checks (SecurityHardeningTest) |
+| 47 Full E2E | 🔶 | Home service §126 + Project §127 + dispute + withdrawal PASS; corporate E2E pending |
+| 48 UI Polish | ⬜ | Web UI layer pending (API-first decision) |
+| 49 Prod Readiness | ✅ | .env.example, scheduler jobs, health endpoints, deployment docs |
+| 50 Final Audit | ✅ | FINAL_AUDIT.md — 95 tests/461 assertions green |
