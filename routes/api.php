@@ -138,6 +138,21 @@ use Illuminate\Support\Facades\Route;
         // Admin dispute resolution (DisputeOfficer)
         Route::middleware(['auth:sanctum', 'permission:dispute.resolve'])->post('/admin/disputes', [\App\Http\Controllers\Api\V1\Admin\DisputeAdminController::class, 'resolve'])->name('admin.disputes.resolve');
 
+        // Support / CMS / SEO (public + customer)
+        Route::get('/cms/blocks', [\App\Http\Controllers\Api\V1\CmsController::class, 'homepageBlocks'])->name('cms.blocks');
+        Route::get('/cms/pages/{slug}', [\App\Http\Controllers\Api\V1\CmsController::class, 'page'])->name('cms.page');
+        Route::get('/blog', [\App\Http\Controllers\Api\V1\CmsController::class, 'blog'])->name('cms.blog');
+        Route::get('/blog/{slug}', [\App\Http\Controllers\Api\V1\CmsController::class, 'blogPost'])->name('cms.blog-post');
+        Route::get('/jasa/{category}', [\App\Http\Controllers\Api\V1\CmsController::class, 'seoLanding'])->name('seo.landing');
+        Route::get('/jasa/{category}/{city}', [\App\Http\Controllers\Api\V1\CmsController::class, 'seoLanding'])->name('seo.landing-city');
+
+        Route::middleware('auth:sanctum')->prefix('support')->group(function (): void {
+            Route::post('/tickets', [\App\Http\Controllers\Api\V1\SupportController::class, 'createTicket'])->name('support.ticket-create');
+            Route::get('/tickets', [\App\Http\Controllers\Api\V1\SupportController::class, 'myTickets'])->name('support.tickets');
+            Route::get('/tickets/{id}', [\App\Http\Controllers\Api\V1\SupportController::class, 'ticket'])->name('support.ticket');
+            Route::post('/tickets/{id}/reply', [\App\Http\Controllers\Api\V1\SupportController::class, 'reply'])->name('support.reply');
+        });
+
         // Partner services management
         Route::middleware(['auth:sanctum', 'permission:partner.service.manage'])->prefix('partner/services')->group(function (): void {
             Route::get('/', [CatalogController::class, 'myServices'])->name('partner.services.index');
