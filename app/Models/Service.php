@@ -3,25 +3,37 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Service extends Model
 {
+    use HasFactory;
+
     public const PRICE_MODELS = ['fixed', 'per_unit', 'hourly', 'daily', 'starting_from', 'package', 'quotation', 'milestone'];
+
     public const STATUSES = ['draft', 'pending_review', 'active', 'paused', 'rejected'];
 
     protected $fillable = [
         'partner_id', 'category_id', 'template_id', 'title', 'slug', 'description',
         'inclusions', 'exclusions', 'fulfillment_type', 'delivery_mode', 'price_model',
         'base_price', 'unit_label', 'min_quantity', 'max_quantity', 'duration_minutes',
-        'emergency_capable', 'emergency_surcharge', 'warranty_days', 'status', 'media', 'attributes',
+        'emergency_capable', 'emergency_surcharge', 'warranty_days', 'status', 'media', 'attributes', 'is_demo',
     ];
 
     protected function casts(): array
     {
         return ['media' => 'array', 'attributes' => 'array', 'emergency_capable' => 'boolean'];
+    }
+
+    /** Cover path resolved from media JSON (cover key first, then first slot). */
+    public function getCoverImageAttribute(): ?string
+    {
+        $media = $this->media ?? [];
+
+        return $media['cover'] ?? (is_string($media[0] ?? null) ? $media[0] : null);
     }
 
     public function partner(): BelongsTo

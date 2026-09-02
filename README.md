@@ -32,13 +32,59 @@ Platform *service commerce* lengkap: marketplace jasa rumah tangga, jasa profesi
 - **Finance** — Ledger double-entry (Σdebit=Σcredit diuji), Commission snapshot immutable, Settlement (double-settle guard), Withdrawal (reservasi race-safe, min amount), Refund (eligibility + lock konkuren) — **semua invariant test hijau**
 - **Health & Observability** — `/api/v1/health` (DB+Redis), structured logs, audit log untuk aksi sensitif
 
+## Demo Data
+
+Jasapedia menyertakan **production-quality demo dataset** agar storefront, partner center, admin command center, project marketplace, RFQ, dan Jasapedia Business terasa seperti marketplace yang hidup — bukan instalasi kosong.
+
+```bash
+# Seed dataset demo lengkap (default):
+#   10.000 service listing aktif | 2.500 provider | 5.000 customer
+#   3.000 order | 500 project | 500 RFQ | 7.000 review | 50 corporate
+php artisan jasapedia:seed-demo
+
+# Hapus HANYA data bertanda is_demo, lalu seed ulang dari nol:
+php artisan jasapedia:seed-demo --fresh-demo
+
+# Custom volume (untuk CI / laptop lemot):
+php artisan jasapedia:seed-demo --services=210 --providers=21 --customers=40 --orders=25 --reviews=15 --fresh-demo
+```
+
+> ⚠️ **JANGAN jalankan di production.** Perintah ini **menolak berjalan** ketika `APP_ENV=production` kecuali diberi `--force` **dan** konfirmasi interaktif. Dataset ditandai `is_demo=1` di seluruh tabel utama — `--fresh-demo` hanya menghapus baris demo, data produksi/customer asli tidak pernah disentuh. Menjalankan perintah kedua kali tanpa `--fresh-demo` akan **ditolak** (idempotent guard).
+
+**Kondisi yang dipenuhi dataset demo:**
+
+- Tepat **10.000 service listing aktif** terdistribusi ke **21 kategori blueprint** (normalisasi largest-remainder, di-assert seeder)
+- Judul/deskripsi/harga Bahasa Indonesia **spesifik per kategori** dari dictionary (bukan lorem ipsum), slug unik
+- Harga IDR integer dalam range realistis per kategori (mis. Cleaning Rp50rb–2,5jt; Renovation Rp500rb–250jt; Construction s.d. Rp1M)
+- Provider: 60% individual/freelancer, 30% vendor, 10% company (partner_organizations + members), verifikasi 75% verified; **level badge dihitung dari data** (completed_jobs + rating) mengikuti logika existing — tidak ada badge palsu
+- Lokasi realistis ter-konsentrasi ke Jabodetabek, Bandung, Surabaya, dll. (koordinat = jitter pusat kota valid dari LocationSeeder)
+- Order: subset finance-complete dijalankan **lewat domain services asli** (`OrderService` → `PaymentService` sandbox webhook → `OrderStateMachine` → `SettlementService` → `RefundService`/`WithdrawalService`) — **ledger double-entry tetap balanced**, Σ debit = Σ credit
+- Review: hanya untuk order `completed|settled|closed` (1 review/order), rating 5★ ~70% / 4★ ~21% / 3★ ~6%, dimension ratings mengikuti `Category.config.review_dimensions`, rating partner dihitung ulang dari agregat (bukan ditulis manual)
+- Project marketplace + proposal + kontrak + milestone; RFQ + quotation (open/closed/awarded); corporate (branches, departments, cost centers, approval policies, CSR + PO)
+- Media: pool gambar lokal deterministik per kategori (360 file: cover WebP 1200×800, avatar SVG provider, banner kategori — tanpa download jaringan, tanpa hotlink eksternal); 100% service punya cover, 70% punya 2+ galeri, avatar semua provider terisi
+- Homepage/explore/admin langsung penuh: kategori, jasa populer, provider terverifikasi, review, blog, SEO metadata
+
+**Akun demo (hanya lokal/demo):**
+
+| Role | Email | Password |
+|---|---|---|
+| Customer | `customer@jasapedia.test` | `password` |
+| Provider | `provider@jasapedia.test` | `password` |
+| Company (vendor) | `company@jasapedia.test` | `password` |
+| Corporate | `corporate@jasapedia.test` | `password` |
+| Admin | `admin@jasapedia.test` | `password` (InitialAdminSeeder) |
+
+Kredensial demo **tidak pernah ditampilkan** di output command ketika `APP_ENV=production`.
+
+Env terkait (`config/demo.php`): `DEMO_DATA_ENABLED=false` (master switch untuk auto-seed via `db:seed`), `DEMO_SEED=20260901`, `DEMO_SERVICES=10000`, `DEMO_EMAIL_DOMAIN=example.test` (semua email demo memakai domain non-routable).
+
 ## Testing
 
 ```bash
 php artisan test
 ```
 
-76 test / 380+ assertion meliputi: unit (Money/TOTP/pricing/availability), feature (auth/RBAC/partner/catalog/order/payment/chat/notif), **E2E kritis**:
+157 test / 3.600+ assertion meliputi: unit (Money/TOTP/pricing/availability/finance-invariant), feature (auth/RBAC/partner/catalog/order/payment/chat/notif/demo-dataset), **E2E kritis**:
 
 - **Home Service (§126)**: search → book → pay → dispatch → accept → OTP check-in → evidence → additional charge → complete ✓
 - **Project (§127)**: post → proposal → shortlist → award → contract → milestone funding → revision → approval → **release + ledger** ✓

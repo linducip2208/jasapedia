@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Domain\Authorization\PermissionRegistrar;
+use App\Observers\UserObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -10,13 +12,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[ObservedBy([\App\Observers\UserObserver::class])]
+#[ObservedBy([UserObserver::class])]
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password', 'phone', 'status', 'locale',
+        'name', 'email', 'password', 'phone', 'status', 'locale', 'is_demo',
         'email_verified_at', 'phone_verified_at', 'two_factor_enabled_at',
     ];
 
@@ -67,12 +69,12 @@ class User extends Authenticatable
 
     public function permissions(): array
     {
-        return app(\App\Domain\Authorization\PermissionRegistrar::class)->userPermissions($this);
+        return app(PermissionRegistrar::class)->userPermissions($this);
     }
 
     public function can($ability, $arguments = []): bool
     {
-        if (app(\App\Domain\Authorization\PermissionRegistrar::class)->userHasPermission($this, $ability)) {
+        if (app(PermissionRegistrar::class)->userHasPermission($this, $ability)) {
             return true;
         }
 

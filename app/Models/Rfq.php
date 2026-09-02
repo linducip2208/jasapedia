@@ -12,7 +12,7 @@ class Rfq extends Model
 
     protected $fillable = [
         'code', 'user_id', 'category_id', 'title', 'description', 'requirements',
-        'attachments', 'deadline', 'invited_partner_ids', 'visibility', 'status',
+        'attachments', 'deadline', 'invited_partner_ids', 'visibility', 'status', 'is_demo',
     ];
 
     protected function casts(): array

@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Review extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'order_id', 'author_id', 'partner_id', 'overall', 'dimension_ratings',
-        'comment', 'images', 'partner_response', 'responded_at', 'status',
+        'comment', 'images', 'partner_response', 'responded_at', 'status', 'is_demo',
     ];
 
     protected function casts(): array

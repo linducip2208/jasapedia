@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,13 +10,17 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Partner extends Model
 {
+    use HasFactory;
+
     public const VERIFICATION_STATES = ['unverified', 'submitted', 'under_review', 'needs_revision', 'verified', 'rejected', 'suspended'];
+
     public const TYPES = ['freelancer', 'individual', 'vendor_company'];
+
     public const ONLINE_STATUSES = ['offline', 'online', 'busy'];
 
     protected $fillable = [
         'user_id', 'type', 'display_name', 'slug', 'about', 'avatar_path',
-        'verification_state', 'online_status', 'city', 'lat', 'lng', 'meta',
+        'verification_state', 'online_status', 'city', 'lat', 'lng', 'meta', 'is_demo',
     ];
 
     protected function casts(): array

@@ -12,16 +12,12 @@
     @forelse($services as $service)
         <article class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div class="flex min-w-0 items-center gap-3.5">
-                @php $cover = ($service->media['cover'] ?? null); @endphp
-                @if($cover)
-                    <img src="{{ app(\App\Domain\Catalog\MediaService::class)->url($cover) }}" alt="" class="h-14 w-20 shrink-0 rounded-xl object-cover" loading="lazy"/>
-                @else
-                    <span class="flex h-14 w-20 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-400"><x-brand.mark class="h-7 w-7"/></span>
-                @endif
+                <x-ui.service-image :service="$service" aspect="h-14 w-20 rounded-xl" class="shrink-0"/>
                 <div class="min-w-0">
                     <p class="truncate font-semibold text-slate-900">{{ $service->title }}</p>
-                    <p class="text-xs text-slate-500">{{ $service->category->name ?? '' }} · <x-ui.money :amount="$service->base_price"/></p>
+                    <p class="text-xs text-slate-500">{{ $service->category->name ?? '' }} • <x-ui.money :amount="$service->base_price"/></p>
                 </div>
+            </div>
             </div>
             <div class="flex items-center gap-2.5">
                 <x-ui.badge tone="{{ $service->status === 'active' ? 'green' : 'amber' }}">{{ $service->status === 'active' ? 'Aktif' : 'Jeda' }}</x-ui.badge>

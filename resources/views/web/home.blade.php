@@ -33,7 +33,9 @@
     <div class="grid grid-cols-4 gap-2.5 sm:grid-cols-8">
         @forelse($popular as $cat)
             <a href="{{ route('web.explore', ['category' => $cat->slug]) }}" class="group flex flex-col items-center gap-2 rounded-2xl bg-white p-3 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-lg font-black text-teal-700 group-hover:bg-teal-600 group-hover:text-white">{{ mb_substr($cat->name, 0, 1) }}</span>
+                <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-teal-700 group-hover:bg-teal-600 group-hover:text-white">
+                    <x-brand.category-icon :icon="$cat->icon" class="h-6 w-6"/>
+                </span>
                 <span class="line-clamp-2 text-[11px] font-semibold leading-tight text-slate-700">{{ $cat->name }}</span>
             </a>
         @empty
@@ -81,6 +83,87 @@
     @empty
         <x-ui.empty-state title="Belum ada jasa" description="Jasa akan muncul di sini setelah penyedia mulai berjualan." actionUrl="{{ route('web.partner.onboarding') }}" actionLabel="Jadi Penyedia Pertama"/>
     @endforelse
+</section>
+
+{{-- TOP PROVIDERS --}}
+<section class="mt-10" aria-label="Penyedia teratas">
+    <div class="mb-4 flex items-end justify-between">
+        <div>
+            <h2 class="text-lg font-extrabold text-slate-900 sm:text-xl">Penyedia Teratas</h2>
+            <p class="text-sm text-slate-500">Rating dan ulasan tertinggi dari pelanggan nyata</p>
+        </div>
+        <a href="{{ route('web.explore', ['sort' => 'rating']) }}" class="text-sm font-bold text-teal-700 hover:underline">Lihat semua</a>
+    </div>
+    @forelse($topProviders as $provider)
+        @php $firstProvider = $loop->first; @endphp
+        @if($firstProvider)<div class="grid grid-cols-2 gap-3 sm:grid-cols-4">@endif
+        <a href="{{ route('web.provider.show', $provider) }}" class="group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-100 text-sm font-black text-teal-700 group-hover:bg-teal-600 group-hover:text-white">
+                {{ mb_substr($provider->display_name, 0, 1) }}
+            </span>
+            <span class="min-w-0">
+                <span class="block truncate text-sm font-bold text-slate-900">{{ $provider->display_name }}</span>
+                <span class="block text-[11px] text-slate-500">{{ $provider->city ?? 'Indonesia' }}</span>
+                <span class="mt-0.5 flex items-center gap-1 text-[11px] text-amber-600">
+                    ★ {{ number_format($provider->rating_avg, 1) }} <span class="text-slate-400">({{ number_format($provider->rating_count) }} ulasan)</span>
+                </span>
+            </span>
+        </a>
+        @if($loop->last)</div>@endif
+    @empty
+        <p class="text-sm text-slate-400">Belum ada penyedia terverifikasi.</p>
+    @endforelse
+</section>
+
+{{-- AVAILABLE TODAY --}}
+<section class="mt-10" aria-label="Tersedia hari ini">
+    <div class="mb-4 flex items-end justify-between">
+        <div>
+            <h2 class="text-lg font-extrabold text-slate-900 sm:text-xl">Tersedia Hari Ini</h2>
+            <p class="text-sm text-slate-500">Penyedia yang sedang online dan siap dipesan</p>
+        </div>
+        <a href="{{ route('web.explore') }}" class="text-sm font-bold text-teal-700 hover:underline">Lihat semua</a>
+    </div>
+    @forelse($availableToday as $service)
+        @php $firstAvail = $loop->first; @endphp
+        @if($firstAvail)<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">@endif
+        <x-ui.service-card :service="$service"/>
+        @if($loop->last)</div>@endif
+    @empty
+        <p class="text-sm text-slate-400">Tidak ada penyedia online saat ini.</p>
+    @endforelse
+</section>
+
+{{-- OPEN PROJECTS (MARKETPLACE) --}}
+<section class="mt-10" aria-label="Proyek terbuka">
+    <div class="mb-4 flex items-end justify-between">
+        <div>
+            <h2 class="text-lg font-extrabold text-slate-900 sm:text-xl">Proyek Terbuka</h2>
+            <p class="text-sm text-slate-500">Kebutuhan klien yang sedang mencari freelancer & vendor</p>
+        </div>
+        <a href="{{ route('web.projects.index') }}" class="text-sm font-bold text-teal-700 hover:underline">Lihat semua</a>
+    </div>
+    <div class="grid gap-3 sm:grid-cols-2">
+        @forelse($openProjects as $project)
+            <a href="{{ route('web.projects.show', $project) }}" class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <p class="text-[11px] font-bold uppercase tracking-wide text-indigo-600">{{ $project->category?->name }}</p>
+                <h3 class="mt-1 line-clamp-1 font-bold text-slate-900 group-hover:text-indigo-700">{{ $project->title }}</h3>
+                <p class="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-500">{{ \Illuminate\Support\Str::limit($project->description, 120) }}</p>
+                <div class="mt-2.5 flex items-center justify-between text-xs">
+                    <span class="font-bold text-slate-700">
+                        @if($project->budget_min && $project->budget_max)
+                            Rp{{ number_format($project->budget_min / 1000) }}rb – Rp{{ number_format($project->budget_max / 1000000, 1) }}jt
+                        @else
+                            Nego
+                        @endif
+                    </span>
+                    <span class="text-slate-400">{{ $project->proposals_count }} proposal</span>
+                </div>
+            </a>
+        @empty
+            <p class="text-sm text-slate-400">Belum ada proyek terbuka.</p>
+        @endforelse
+    </div>
 </section>
 
 {{-- HOW IT WORKS --}}

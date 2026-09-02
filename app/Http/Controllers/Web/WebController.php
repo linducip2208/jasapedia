@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Domain\FieldService\FieldServiceService;
 use App\Domain\Order\OrderService;
+use App\Domain\Payment\Contracts\PaymentGatewayInterface;
+use App\Domain\Payment\Gateways\SandboxGateway;
 use App\Domain\Payment\PaymentService;
+use App\Domain\Trust\ReviewService;
 use App\Http\Controllers\Controller;
-use App\Models\Conversation;
+use App\Models\BlogPost;
+use App\Models\Category;
+use App\Models\CmsPage;
 use App\Models\Order;
+use App\Models\Partner;
+use App\Models\Project;
 use App\Models\Service;
-use App\Support\Http\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,8 +28,30 @@ class WebController extends Controller
     public function home()
     {
         return view('web.home', [
-            'categories' => \App\Models\Category::where('is_active', true)->orderBy('sort')->get(),
+            'categories' => Category::where('is_active', true)->orderBy('sort')->get(),
             'services' => Service::query()->active()->with('category:id,name,icon', 'partner')->latest()->take(8)->get(),
+            'topProviders' => Partner::query()
+                ->where('verification_state', 'verified')
+                ->where('rating_count', '>', 0)
+                ->orderByDesc('rating_avg')
+                ->orderByDesc('rating_count')
+                ->take(8)
+                ->get(['id', 'display_name', 'slug', 'city', 'rating_avg', 'rating_count', 'completed_jobs', 'avatar_path']),
+            'availableToday' => Service::query()
+                ->active()
+                ->whereHas('partner', fn ($q) => $q->where('online_status', 'online')->where('verification_state', 'verified'))
+                ->with('category:id,name,icon', 'partner')
+                ->inRandomOrder()
+                ->take(8)
+                ->get(),
+            'openProjects' => Project::query()
+                ->where('status', 'receiving_proposals')
+                ->where('visibility', 'public')
+                ->with('category:id,name,slug')
+                ->withCount('proposals')
+                ->latest()
+                ->take(4)
+                ->get(),
             'activeOrder' => Auth::check()
                 ? Order::where('user_id', Auth::id())->whereNotIn('status', ['completed', 'settled', 'closed', 'cancelled', 'expired', 'failed', 'refunded'])->latest()->first()
                 : null,
@@ -58,7 +87,7 @@ class WebController extends Controller
         };
 
         return view('web.explore', [
-            'categories' => \App\Models\Category::where('is_active', true)->orderBy('sort')->get(),
+            'categories' => Category::where('is_active', true)->orderBy('sort')->get(),
             'services' => $query->paginate(12)->withQueryString(),
         ]);
     }
@@ -120,7 +149,7 @@ class WebController extends Controller
         // Sandbox auto-pay for the web flow (dev only)
         if (! app()->environment('production')) {
             $tx = $order->paymentTransactions()->where('status', 'pending')->first();
-            $event = app(\App\Domain\Payment\Gateways\SandboxGateway::class)->verifyWebhook(
+            $event = app(SandboxGateway::class)->verifyWebhook(
                 new Request($payload = [
                     'order_code' => $order->code,
                     'gateway_ref' => $tx->gateway_ref,
@@ -136,7 +165,7 @@ class WebController extends Controller
             if (! $event) {
                 $request->headers->set('X-Sandbox-Signature', $payload['signature']);
                 $request->merge($payload);
-                $event = app(\App\Domain\Payment\Contracts\PaymentGatewayInterface::class)->verifyWebhook($request);
+                $event = app(PaymentGatewayInterface::class)->verifyWebhook($request);
             }
 
             app(PaymentService::class)->handleWebhook('sandbox', $event);
@@ -160,7 +189,7 @@ class WebController extends Controller
         $data = $request->validate(['otp' => ['required', 'string', 'size:6']]);
         $order = Order::where('user_id', $request->user()->id)->findOrFail($id);
 
-        app(\App\Domain\FieldService\FieldServiceService::class)->verifyCheckin($order, $data['otp'], $request->user());
+        app(FieldServiceService::class)->verifyCheckin($order, $data['otp'], $request->user());
 
         return back()->with('success', 'Teknisi terkonfirmasi hadir.');
     }
@@ -183,21 +212,21 @@ class WebController extends Controller
         ]);
 
         $order = Order::where('user_id', $request->user()->id)->findOrFail($id);
-        app(\App\Domain\Trust\ReviewService::class)->create($order, $request->user(), $data);
+        app(ReviewService::class)->create($order, $request->user(), $data);
 
         return back()->with('success', 'Ulasan terkirim. Terima kasih!');
     }
 
     public function page(string $slug)
     {
-        $page = \App\Models\CmsPage::where('slug', $slug)->where('status', 'published')->firstOrFail();
+        $page = CmsPage::where('slug', $slug)->where('status', 'published')->firstOrFail();
 
         return view('web.page', ['page' => $page]);
     }
 
     public function blogIndex()
     {
-        $posts = \App\Models\BlogPost::where('status', 'published')
+        $posts = BlogPost::where('status', 'published')
             ->orderByDesc('published_at')->paginate(12);
 
         return view('web.blog.index', ['posts' => $posts]);
@@ -205,7 +234,7 @@ class WebController extends Controller
 
     public function blogShow(string $slug)
     {
-        $post = \App\Models\BlogPost::where('slug', $slug)->where('status', 'published')->firstOrFail();
+        $post = BlogPost::where('slug', $slug)->where('status', 'published')->firstOrFail();
 
         return view('web.blog.show', ['post' => $post]);
     }

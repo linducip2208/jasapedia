@@ -9,12 +9,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Project extends Model
 {
     public const STATUSES = ['draft', 'published', 'receiving_proposals', 'shortlisting', 'negotiation', 'awarded', 'contracting', 'active', 'on_hold', 'completed', 'closed', 'cancelled', 'disputed'];
+
     public const BUDGET_TYPES = ['fixed', 'hourly', 'range'];
 
     protected $fillable = [
         'code', 'user_id', 'category_id', 'title', 'description', 'requirements', 'skills',
         'budget_type', 'budget_min', 'budget_max', 'deadline', 'attachments', 'visibility',
-        'status', 'active_status_snapshot', 'awarded_partner_id',
+        'status', 'active_status_snapshot', 'awarded_partner_id', 'is_demo',
     ];
 
     protected function casts(): array

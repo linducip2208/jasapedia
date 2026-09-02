@@ -4,7 +4,6 @@ namespace App\Domain\Catalog;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use RuntimeException;
 
 /**
@@ -56,6 +55,12 @@ class MediaService
 
     public function url(string $path): string
     {
+        // Static demo assets ship in the public web root (public/demo/**),
+        // not on the storage disk — serve them as-is.
+        if (str_starts_with($path, 'demo/')) {
+            return asset($path);
+        }
+
         return Storage::disk(config('services.media.disk', 'public'))->url($path);
     }
 
