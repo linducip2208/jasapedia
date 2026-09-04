@@ -3,56 +3,124 @@
 @section('title', 'Admin Dashboard | Jasapedia')
 
 @section('admin-content')
-<h1 class="text-xl font-extrabold text-white">Command Center</h1>
-<p class="text-sm text-slate-400">Semua angka dihitung real-time dari database.</p>
+<div class="d-flex flex-wrap align-items-baseline gap-2">
+    <h1 class="h3 fw-bolder mb-0">Command Center</h1>
+</div>
+<p class="text-body-secondary small mb-4">Semua angka dihitung real-time dari database.</p>
 
-{{-- Financial metrics --}}
-<div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-6">
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">GMV</p><p class="mt-1 text-xl font-extrabold text-teal-400">{{ (new \App\Support\Money\Money($gmv))->format() }}</p></div>
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Total Order</p><p class="mt-1 text-xl font-extrabold text-white">{{ number_format($orders) }}</p></div>
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Order Selesai</p><p class="mt-1 text-xl font-extrabold text-white">{{ number_format($completedOrders) }}</p></div>
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Order Aktif</p><p class="mt-1 text-xl font-extrabold text-amber-400">{{ number_format($activeOrders) }}</p></div>
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Cancel Rate</p><p class="mt-1 text-xl font-extrabold text-rose-400">{{ $cancelRate }}%</p></div>
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Dispute Rate</p><p class="mt-1 text-xl font-extrabold text-rose-400">{{ $disputeRate }}%</p></div>
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Provider Verified</p><p class="mt-1 text-xl font-extrabold text-white">{{ number_format($activeProviders) }}</p></div>
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Customers</p><p class="mt-1 text-xl font-extrabold text-white">{{ number_format($customers) }}</p></div>
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Komisi (ledger)</p><p class="mt-1 text-xl font-extrabold text-teal-400">{{ (new \App\Support\Money\Money($commission))->format() }}</p></div>
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Settlement Pending</p><p class="mt-1 text-xl font-extrabold text-amber-400">{{ number_format($pendingSettlement) }}</p></div>
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Withdrawal Pending</p><p class="mt-1 text-xl font-extrabold text-amber-400">{{ number_format($pendingWithdrawal) }}</p></div>
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">KYC Pending</p><p class="mt-1 text-xl font-extrabold text-white">{{ number_format($kycPending) }}</p></div>
+<div class="row g-3">
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card stat-card h-100"><div class="card-body">
+            <p class="stat-label text-body-secondary mb-1">GMV</p>
+            <p class="stat-value text-brand mb-0">{{ (new \App\Support\Money\Money($gmv))->format() }}</p>
+        </div></div>
+    </div>
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card stat-card h-100"><div class="card-body">
+            <p class="stat-label text-body-secondary mb-1">Total Order</p>
+            <p class="stat-value mb-0">{{ number_format($orders) }}</p>
+        </div></div>
+    </div>
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card stat-card h-100"><div class="card-body">
+            <p class="stat-label text-body-secondary mb-1">Order Selesai</p>
+            <p class="stat-value mb-0">{{ number_format($completedOrders) }}</p>
+        </div></div>
+    </div>
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card stat-card h-100"><div class="card-body">
+            <p class="stat-label text-body-secondary mb-1">Order Aktif</p>
+            <p class="stat-value text-warning mb-0">{{ number_format($activeOrders) }}</p>
+        </div></div>
+    </div>
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card stat-card h-100"><div class="card-body">
+            <p class="stat-label text-body-secondary mb-1">Cancel Rate</p>
+            <p class="stat-value text-danger mb-0">{{ $cancelRate }}%</p>
+        </div></div>
+    </div>
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card stat-card h-100"><div class="card-body">
+            <p class="stat-label text-body-secondary mb-1">Dispute Rate</p>
+            <p class="stat-value text-danger mb-0">{{ $disputeRate }}%</p>
+        </div></div>
+    </div>
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card stat-card h-100"><div class="card-body">
+            <p class="stat-label text-body-secondary mb-1">Provider Verified</p>
+            <p class="stat-value mb-0">{{ number_format($activeProviders) }}</p>
+        </div></div>
+    </div>
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card stat-card h-100"><div class="card-body">
+            <p class="stat-label text-body-secondary mb-1">Customers</p>
+            <p class="stat-value mb-0">{{ number_format($customers) }}</p>
+        </div></div>
+    </div>
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card stat-card h-100"><div class="card-body">
+            <p class="stat-label text-body-secondary mb-1">Komisi (ledger)</p>
+            <p class="stat-value text-brand mb-0">{{ (new \App\Support\Money\Money($commission))->format() }}</p>
+        </div></div>
+    </div>
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card stat-card h-100"><div class="card-body">
+            <p class="stat-label text-body-secondary mb-1">Settlement Pending</p>
+            <p class="stat-value text-warning mb-0">{{ number_format($pendingSettlement) }}</p>
+        </div></div>
+    </div>
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card stat-card h-100"><div class="card-body">
+            <p class="stat-label text-body-secondary mb-1">Withdrawal Pending</p>
+            <p class="stat-value text-warning mb-0">{{ number_format($pendingWithdrawal) }}</p>
+        </div></div>
+    </div>
+    <div class="col-6 col-sm-4 col-xl-2">
+        <div class="card stat-card h-100"><div class="card-body">
+            <p class="stat-label text-body-secondary mb-1">KYC Pending</p>
+            <p class="stat-value mb-0">{{ number_format($kycPending) }}</p>
+        </div></div>
+    </div>
 </div>
 
-{{-- Operations --}}
-<div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Mencari Provider</p><p class="mt-1 text-lg font-extrabold text-white">{{ number_format($searchingProvider) }}</p></div>
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Menuju Lokasi</p><p class="mt-1 text-lg font-extrabold text-white">{{ number_format($onTheWay) }}</p></div>
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Sedang Kerja</p><p class="mt-1 text-lg font-extrabold text-white">{{ number_format($working) }}</p></div>
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Nunggu Konfirmasi</p><p class="mt-1 text-lg font-extrabold text-white">{{ number_format($awaitingConfirmation) }}</p></div>
-    <div class="rounded-2xl bg-slate-900 p-4 ring-1 ring-slate-800"><p class="text-[10px] font-black uppercase tracking-wider text-slate-500">Sengketa Terbuka</p><p class="mt-1 text-lg font-extrabold text-rose-400">{{ number_format($disputesOpen) }}</p></div>
+<h2 class="h6 fw-bold text-uppercase text-body-secondary mt-4">Operasi Lapangan</h2>
+<div class="row g-3">
+    <div class="col-6 col-sm-4 col-xl-2"><div class="card stat-card h-100"><div class="card-body"><p class="stat-label text-body-secondary mb-1">Mencari Provider</p><p class="stat-value mb-0">{{ number_format($searchingProvider) }}</p></div></div></div>
+    <div class="col-6 col-sm-4 col-xl-2"><div class="card stat-card h-100"><div class="card-body"><p class="stat-label text-body-secondary mb-1">Menuju Lokasi</p><p class="stat-value mb-0">{{ number_format($onTheWay) }}</p></div></div></div>
+    <div class="col-6 col-sm-4 col-xl-2"><div class="card stat-card h-100"><div class="card-body"><p class="stat-label text-body-secondary mb-1">Sedang Kerja</p><p class="stat-value mb-0">{{ number_format($working) }}</p></div></div></div>
+    <div class="col-6 col-sm-4 col-xl-2"><div class="card stat-card h-100"><div class="card-body"><p class="stat-label text-body-secondary mb-1">Nunggu Konfirmasi</p><p class="stat-value mb-0">{{ number_format($awaitingConfirmation) }}</p></div></div></div>
+    <div class="col-6 col-sm-4 col-xl-2"><div class="card stat-card h-100"><div class="card-body"><p class="stat-label text-body-secondary mb-1">Sengketa Terbuka</p><p class="stat-value text-danger mb-0">{{ number_format($disputesOpen) }}</p></div></div></div>
 </div>
 
-{{-- Charts: real data, pure CSS bars --}}
-<div class="mt-6 grid gap-4 lg:grid-cols-2">
-    <div class="rounded-2xl bg-slate-900 p-5 ring-1 ring-slate-800">
-        <h2 class="text-sm font-bold text-white">Volume Order — 14 hari</h2>
-        @php $maxOrders = max(1, max(array_column($orderSeries, 'count') ?: [1])); @endphp
-        <div class="mt-4 flex h-32 items-end gap-1.5">
-            @forelse($orderSeries as $point)
-                <div class="flex-1 rounded-t bg-teal-500/70" style="height: {{ max(4, $point['count'] / $maxOrders * 100) }}%" title="{{ $point['date'] }}: {{ $point['count'] }}"></div>
-            @empty
-                <p class="text-sm text-slate-500">Belum ada data order.</p>
-            @endforelse
+<div class="row g-3 mt-1">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header fw-bold">Volume Order — 14 hari</div>
+            <div class="card-body">
+                @php $maxOrders = max(1, max(array_column($orderSeries, 'count') ?: [1])); @endphp
+                <div class="d-flex align-items-end gap-1" style="height: 8rem;">
+                    @forelse($orderSeries as $point)
+                        <div class="flex-fill rounded-top" style="height: {{ max(4, $point['count'] / $maxOrders * 100) }}%; background: rgba(20, 184, 166, 0.7);" title="{{ $point['date'] }}: {{ $point['count'] }}"></div>
+                    @empty
+                        <p class="text-body-secondary small mb-0">Belum ada data order.</p>
+                    @endforelse
+                </div>
+            </div>
         </div>
     </div>
-    <div class="rounded-2xl bg-slate-900 p-5 ring-1 ring-slate-800">
-        <h2 class="text-sm font-bold text-white">GMV Harian — 14 hari</h2>
-        @php $maxGmv = max(1, max(array_column($gmvSeries, 'total') ?: [1])); @endphp
-        <div class="mt-4 flex h-32 items-end gap-1.5">
-            @forelse($gmvSeries as $point)
-                <div class="flex-1 rounded-t bg-amber-400/70" style="height: {{ max(4, $point['total'] / $maxGmv * 100) }}%" title="{{ $point['date'] }}: {{ (new \App\Support\Money\Money($point['total']))->format() }}"></div>
-            @empty
-                <p class="text-sm text-slate-500">Belum ada transaksi.</p>
-            @endforelse
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header fw-bold">GMV Harian — 14 hari</div>
+            <div class="card-body">
+                @php $maxGmv = max(1, max(array_column($gmvSeries, 'total') ?: [1])); @endphp
+                <div class="d-flex align-items-end gap-1" style="height: 8rem;">
+                    @forelse($gmvSeries as $point)
+                        <div class="flex-fill rounded-top" style="height: {{ max(4, $point['total'] / $maxGmv * 100) }}%; background: rgba(251, 191, 36, 0.7);" title="{{ $point['date'] }}: {{ (new \App\Support\Money\Money($point['total']))->format() }}"></div>
+                    @empty
+                        <p class="text-body-secondary small mb-0">Belum ada transaksi.</p>
+                    @endforelse
+                </div>
+            </div>
         </div>
     </div>
 </div>

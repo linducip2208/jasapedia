@@ -60,6 +60,8 @@ Platform *service commerce* lengkap: marketplace jasa rumah tangga, jasa profesi
 
 ### 4. Admin Command Center (`/admin`)
 
+- **Shell AdminLTE 4.9.1** (Bootstrap 5, dark mode `data-bs-theme`), diisolasi sebagai Vite entry terpisah (`resources/css/admin.css` + `resources/js/admin.js`) — Bootstrap tidak pernah termuat di storefront Tailwind
+
 - **Dashboard metrik real** — GMV, order volume, cancel/dispute rate, komisi ledger, operasi field, **ledger balance check**
 - **Pesanan** — monitoring seluruh order + status history immutable
 - **Verifikasi penyedia** — KYC/KYB lifecycle (approve/reject + catatan + audit)
@@ -123,7 +125,7 @@ Platform *service commerce* lengkap: marketplace jasa rumah tangga, jasa profesi
 | Penyedia | `/penyedia/{slug}` | profil publik + level transparan (New→Verified→Preferred→Top→Pro dari metrik nyata) |
 | Partner Center | `/partner/*` | dashboard KPI, jasa, pesanan, kebutuhan, proyek, keuangan, ulasan, onboarding + KYC |
 | Business | `/business/*` | landing + dashboard korporat |
-| Admin | `/admin/*` | command center (layout gelap terpisah) |
+| Admin | `/admin/*` | command center (AdminLTE 4, layout gelap terpisah) |
 | Konten | `/blog`, `/halaman/*` | blog + CMS pages |
 
 Error pages 403/404/500 berbahasa Indonesia; branding original `<x-brand.*>` (tanpa branding Laravel).

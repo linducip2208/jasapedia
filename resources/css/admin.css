@@ -1,0 +1,67 @@
+/* Jasapedia Admin shell — AdminLTE 4.9.1 (Bootstrap 5 based).
+   Scope: /admin/* only, loaded as a separate Vite entry so Bootstrap
+   never leaks into the Tailwind storefront. */
+
+@import 'admin-lte/dist/css/adminlte.css';
+@import 'admin-lte/dist/css/adminlte-colors.css';
+
+:root {
+    --jasapedia-brand: #14b8a6; /* teal-500 */
+    --jasapedia-brand-strong: #0d9488; /* teal-600 */
+    --jasapedia-brand-ink: #04201c;
+    --bs-body-font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Segoe UI Emoji';
+}
+
+.text-brand { color: var(--jasapedia-brand); }
+
+.badge-brand {
+    background-color: var(--jasapedia-brand);
+    color: var(--jasapedia-brand-ink);
+}
+
+.btn-brand {
+    background-color: var(--jasapedia-brand);
+    border-color: var(--jasapedia-brand);
+    color: var(--jasapedia-brand-ink);
+}
+
+.btn-brand:hover,
+.btn-brand:focus-visible {
+    background-color: var(--jasapedia-brand-strong);
+    border-color: var(--jasapedia-brand-strong);
+    color: var(--jasapedia-brand-ink);
+}
+
+.nav-icon svg {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.nav-header.text-uppercase {
+    letter-spacing: 0.08em;
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
+/* Initials avatar in the top bar (brand-consistent, no image needed) */
+.admin-avatar {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.8rem;
+    color: var(--jasapedia-brand-ink);
+    background: linear-gradient(135deg, var(--jasapedia-brand), var(--jasapedia-brand-strong));
+}
+
+/* Compact stat card used across the command center */
+.stat-card .stat-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.stat-card .stat-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
