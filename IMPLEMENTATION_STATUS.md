@@ -23,12 +23,12 @@ Legend: ✅ done · 🔶 partial · ⬜ pending. Money = integer IDR. Never fake
 | 16–21 Project/RFQ/Proposal/Quotation/Contract/Milestone | ✅ | E2E PASS + **customer web UI: Posting Kebutuhan wizard, quotation compare/accept, project wizard, proposal comparison, contract+milestone** |
 | 22–27 Ledger/Commission/Settlement/Withdrawal/Refund/Reconciliation | ✅ | Invariants PASS; **partner finance UI (saldo/withdrawal), admin finance console (withdrawal lifecycle)** |
 | 28–32 KYC/KYB/T&S/Dispute/Warranty/Reviews | ✅ | Full E2E dispute PASS; **partner KYC submit UI, admin dispute resolve UI, reviews + partner response UI** |
-| 33–37 Corporate/Recurring/Promo/Referral/Membership | 🔶 | Corporate **web dashboard + service request UI** done; recurring/promo/referral PASS; membership billing cycle pending |
+| 33–37 Corporate/Recurring/Promo/Referral/Membership | 🔶 | Corporate **web dashboard + service request UI** done; recurring/promo/referral PASS; **membership billing cycle done (subscribe/renew/cancel/expiry + invoice order via sandbox pipeline)** |
 | 38–40 Support/CMS/SEO | ✅ | Tickets threaded, CMS pages/blocks/blog, **web page + blog views**, SEO metadata (title/desc/canonical/OG) |
 | 41–43 Command Centers/Analytics | ✅ | **Admin Command Center** (/admin) — real-data metrics, ledger balance check, order volume + GMV charts |
 | 44–45 AI | ✅ | AiManager + advisory-only endpoints, graceful degradation, tests |
 | 46 Hardening | ✅ | Security headers, rate limits, error envelope, authz checks + **web ownership tests, media MIME/magic-bytes validation** |
-| 47 Full E2E | 🔶 | HTTP E2E PASS (home service, project, dispute, withdrawal, corporate); browser E2E pending |
+| 47 Full E2E | 🔶 | HTTP E2E PASS (home service, project, dispute, withdrawal, corporate, quotation→order, membership billing); browser E2E pending |
 | 48 UI Polish | ✅ | **Design system 28 komponen ui/*, customer layout + bottom nav, Partner Center layout, Admin layout, error pages 403/404/500, PWA manifest + SW** |
 | 49 Prod Readiness | ✅ | .env.example lengkap (payment/search/media drivers), scheduler jobs, health endpoints, deployment docs |
 | 50 Final Audit | ✅ | FINAL_AUDIT.md rev 3 — **129 tests / 562 assertions green** |

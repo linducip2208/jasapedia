@@ -46,13 +46,24 @@
                     @if($quotation->terms)<p class="mt-3 text-sm text-slate-500"><strong class="text-slate-700">Syarat:</strong> {{ $quotation->terms }}</p>@endif
                     @if($quotation->valid_until)<p class="mt-1 text-xs text-slate-400">Berlaku sampai {{ $quotation->valid_until->translatedFormat('d F Y') }}</p>@endif
 
-                    @if($rfq->status === 'open')
+                    @if($rfq->status === 'open' && $quotation->status === 'sent')
                         <div class="mt-4 flex flex-wrap gap-2.5">
                             <form method="POST" action="{{ route('web.requests.quotations.accept', [$rfq->id, $quotation->id]) }}">
                                 @csrf
                                 <x-ui.button type="submit" size="sm">Terima Penawaran</x-ui.button>
                             </form>
                             <a href="{{ route('web.chat.index') }}" class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:border-teal-600 hover:text-teal-700">Chat</a>
+                        </div>
+                    @elseif($quotation->status === 'approved')
+                        <div class="mt-4 flex flex-wrap items-center gap-2.5">
+                            @if($quotation->order_id)
+                                <a href="{{ route('web.orders.show', $quotation->order_id) }}" class="rounded-xl bg-teal-50 px-4 py-2 text-sm font-bold text-teal-700 ring-1 ring-teal-200 hover:bg-teal-100">Lihat Pesanan {{ $quotation->order?->code }}</a>
+                            @else
+                                <form method="POST" action="{{ route('web.requests.quotations.order', [$rfq->id, $quotation->id]) }}">
+                                    @csrf
+                                    <x-ui.button type="submit" size="sm">Pesan Sekarang</x-ui.button>
+                                </form>
+                            @endif
                         </div>
                     @endif
                 </article>

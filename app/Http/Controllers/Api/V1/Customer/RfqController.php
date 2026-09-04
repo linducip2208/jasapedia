@@ -60,4 +60,12 @@ class RfqController extends Controller
 
         return $this->ok(['quotation' => $quotation], 'Quotation approved.');
     }
+
+    public function convertQuotation(Request $request, int $quotationId): JsonResponse
+    {
+        $quotation = Quotation::findOrFail($quotationId);
+        $order = $this->rfqs->convertQuotationToOrder($quotation, $request->user());
+
+        return $this->created(['order' => $order->load('items')], 'Quotation converted to order.');
+    }
 }

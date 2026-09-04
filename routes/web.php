@@ -8,6 +8,14 @@ Route::name('web.')->group(function (): void {
     Route::get('/', [Web\WebController::class, 'home'])->name('home');
     Route::get('/explore', [Web\ExploreWebController::class, 'index'])->name('explore');
     Route::get('/jasa/{service:slug}', [Web\WebController::class, 'service'])->name('service');
+    Route::get('/jasa/{category}/{city}', [Web\ExploreWebController::class, 'seoLanding'])->name('seo.landing-city');
+    Route::get('/sitemap.xml', [Web\ExploreWebController::class, 'sitemap'])->name('seo.sitemap');
+
+    // robots.txt rendered as a view so the Sitemap URL follows the current host
+    Route::get('/robots.txt', fn () => response()
+        ->view('web.seo.robots', [], 200)
+        ->header('Content-Type', 'text/plain; charset=UTF-8'))
+        ->name('seo.robots');
     Route::get('/halaman/{slug}', [Web\WebController::class, 'page'])->name('page');
     Route::get('/penyedia/{slug}', [Web\ProviderWebController::class, 'show'])->name('provider.show');
     Route::get('/blog', [Web\WebController::class, 'blogIndex'])->name('blog.index');
@@ -49,6 +57,7 @@ Route::name('web.')->group(function (): void {
             Route::get('/{id}', [Web\RequestWebController::class, 'show'])->name('show');
             Route::post('/{id}/tutup', [Web\RequestWebController::class, 'close'])->name('close');
             Route::post('/{id}/penawaran/{quotationId}/terima', [Web\RequestWebController::class, 'acceptQuotation'])->name('quotations.accept');
+Route::post('/{id}/penawaran/{quotationId}/pesan', [Web\RequestWebController::class, 'orderQuotation'])->name('quotations.order');
         });
 
         // Projects

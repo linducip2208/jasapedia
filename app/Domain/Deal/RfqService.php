@@ -3,6 +3,8 @@
 namespace App\Domain\Deal;
 
 use App\Domain\Auth\DomainException;
+use App\Domain\Order\OrderStateMachine;
+use App\Models\Order;
 use App\Models\Quotation;
 use App\Models\Rfq;
 use App\Models\User;
@@ -14,6 +16,10 @@ use Illuminate\Support\Str;
  */
 class RfqService
 {
+    public function __construct(
+        private readonly OrderStateMachine $states,
+    ) {
+    }
     public function create(User $buyer, array $data): Rfq
     {
         return Rfq::create([
@@ -163,6 +169,72 @@ class RfqService
             Rfq::where('id', $quotation->rfq_id)->update(['status' => 'awarded']);
 
             return $quotation->fresh();
+        });
+    }
+
+    /**
+     * Convert an approved quotation into a payable service order (survey→quotation→order path).
+     * Idempotent: a quotation converts exactly once (order_id set under lock).
+     */
+    public function convertQuotationToOrder(Quotation $quotation, User $buyer): Order
+    {
+        return DB::transaction(function () use ($quotation, $buyer) {
+            $quotation = Quotation::where('id', $quotation->id)->lockForUpdate()->firstOrFail();
+
+            if ($quotation->customer_id !== $buyer->id) {
+                throw new DomainException('Not your quotation.', 'FORBIDDEN', 403);
+            }
+
+            if ($quotation->status !== 'approved') {
+                throw new DomainException("Only approved quotations can be ordered (current: {$quotation->status}).", 'INVALID_STATE', 409);
+            }
+
+            if ($quotation->valid_until && $quotation->valid_until->isPast()) {
+                throw new DomainException('Quotation validity has passed.', 'QUOTATION_EXPIRED', 409);
+            }
+
+            if ($quotation->order_id) {
+                return Order::findOrFail($quotation->order_id);
+            }
+
+            $order = Order::create([
+                'user_id' => $buyer->id,
+                'partner_id' => $quotation->partner_id,
+                'type' => Order::TYPE_SERVICE,
+                'status' => 'draft',
+                'fulfillment_type' => 'rfq',
+                'delivery_mode' => 'onsite',
+                'pricing_snapshot' => [
+                    'source' => 'quotation',
+                    'quotation_id' => $quotation->id,
+                    'quotation_code' => $quotation->code,
+                    'version' => $quotation->version,
+                    'rfq_id' => $quotation->rfq_id,
+                    'currency' => 'IDR',
+                ],
+                'customer_note' => $quotation->terms,
+                'subtotal' => $quotation->subtotal,
+                'emergency_surcharge' => 0,
+                'total' => $quotation->total,
+                'meta' => ['quotation_id' => $quotation->id, 'rfq_id' => $quotation->rfq_id],
+            ]);
+
+            foreach ($quotation->line_items as $line) {
+                $order->items()->create([
+                    'type' => 'base',
+                    'name' => (string) ($line['name'] ?? 'Item'),
+                    'qty' => max(1, (int) ($line['qty'] ?? 1)),
+                    'unit_price' => (int) ($line['unit_price'] ?? 0),
+                    'amount' => (int) ($line['qty'] ?? 1) * (int) ($line['unit_price'] ?? 0),
+                    'ref_id' => $quotation->id,
+                ]);
+            }
+
+            $quotation->update(['order_id' => $order->id]);
+
+            $this->states->transition($order, 'pending_payment', $buyer, 'Quotation converted to order');
+
+            return $order->load('items');
         });
     }
 }

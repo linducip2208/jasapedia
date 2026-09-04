@@ -15,6 +15,8 @@ class Order extends Model
 
     public const TYPE_SERVICE = 'service';
 
+    public const TYPE_MEMBERSHIP = 'membership';
+
     public const TYPE_PROJECT = 'project';
 
     public const TYPE_MILESTONE_FUNDING = 'milestone_funding';

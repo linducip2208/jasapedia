@@ -122,5 +122,10 @@ class PaymentService
         if ($order->type === Order::TYPE_MILESTONE_FUNDING) {
             app(\App\Domain\Deal\MilestoneService::class)->onFundingPaid($order->fresh());
         }
+
+        // Membership invoice: activate/extend the membership
+        if ($order->type === Order::TYPE_MEMBERSHIP) {
+            app(\App\Domain\Growth\MembershipService::class)->onInvoicePaid($order->fresh());
+        }
     }
 }

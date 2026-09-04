@@ -160,12 +160,22 @@ use Illuminate\Support\Facades\Route;
             Route::post('/tickets/{id}/reply', [\App\Http\Controllers\Api\V1\SupportController::class, 'reply'])->name('support.reply');
         });
 
+        // Membership billing cycle
+        Route::get('/membership/plans', [\App\Http\Controllers\Api\V1\Customer\MembershipController::class, 'plans'])->name('membership.plans');
+        Route::middleware('auth:sanctum')->prefix('membership')->group(function (): void {
+            Route::get('/', [\App\Http\Controllers\Api\V1\Customer\MembershipController::class, 'myMembership'])->name('membership.show');
+            Route::post('/subscribe', [\App\Http\Controllers\Api\V1\Customer\MembershipController::class, 'subscribe'])->name('membership.subscribe');
+            Route::post('/renew', [\App\Http\Controllers\Api\V1\Customer\MembershipController::class, 'renew'])->name('membership.renew');
+            Route::post('/cancel', [\App\Http\Controllers\Api\V1\Customer\MembershipController::class, 'cancel'])->name('membership.cancel');
+        });
+
         // RFQ (customer buyer)
         Route::middleware(['auth:sanctum', 'permission:customer.project.manage'])->prefix('rfqs')->group(function (): void {
             Route::post('/', [\App\Http\Controllers\Api\V1\Customer\RfqController::class, 'store'])->name('rfqs.store');
             Route::get('/', [\App\Http\Controllers\Api\V1\Customer\RfqController::class, 'index'])->name('rfqs.index');
             Route::post('/{id}/close', [\App\Http\Controllers\Api\V1\Customer\RfqController::class, 'close'])->name('rfqs.close');
             Route::post('/quotations/{quotationId}/approve', [\App\Http\Controllers\Api\V1\Customer\RfqController::class, 'approveQuotation'])->name('rfqs.quotation-approve');
+Route::post('/quotations/{quotationId}/order', [\App\Http\Controllers\Api\V1\Customer\RfqController::class, 'convertQuotation'])->name('rfqs.quotation-order');
         });
 
         // RFQ (partner quoting)

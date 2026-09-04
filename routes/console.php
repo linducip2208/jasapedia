@@ -37,6 +37,11 @@ Schedule::call(function () {
         ->update(['status' => 'expired']);
 })->daily()->name('quotations-expire');
 
+// Memberships: end subscriptions whose window elapsed
+Schedule::call(function () {
+    app(\App\Domain\Growth\MembershipService::class)->expireOverdue();
+})->daily()->name('memberships-expire');
+
 Artisan::command('inspire', function () {
     $this->comment(\Illuminate\Foundation\Inspiring::quote());
 })->purpose('Display an inspiring quote');

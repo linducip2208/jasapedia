@@ -46,7 +46,7 @@ class RequestWebController extends Controller
 
     public function show(Request $request, int $id)
     {
-        $rfq = Rfq::with(['quotations' => fn ($q) => $q->where('status', 'sent')->with('partner:id,display_name,slug,rating_avg,verification_state')])
+        $rfq = Rfq::with(['quotations' => fn ($q) => $q->whereIn('status', ['sent', 'approved'])->with(['partner:id,display_name,slug,rating_avg,verification_state', 'order:id,code,status'])])
             ->withCount('quotations')
             ->where('user_id', $request->user()->id)
             ->findOrFail($id);
@@ -68,5 +68,14 @@ class RequestWebController extends Controller
         $rfqs->approveQuotation($quotation, $request->user());
 
         return back()->with('success', 'Penawaran diterima! Lanjutkan ke pemesanan.');
+    }
+
+    public function orderQuotation(Request $request, int $id, int $quotationId, RfqService $rfqs)
+    {
+        $quotation = Quotation::where('rfq_id', $id)->findOrFail($quotationId);
+        $order = $rfqs->convertQuotationToOrder($quotation, $request->user());
+
+        return redirect()->route('web.orders.show', $order->id)
+            ->with('success', 'Pesanan dibuat dari penawaran! Lanjutkan pembayaran.');
     }
 }

@@ -32,7 +32,7 @@ A complete *service commerce* platform: a marketplace for home services, profess
 - **Order tracking** — real-time status timeline, completion confirmation, OTP check-in (customer verifies the technician), cancellation governed by the state machine
 - **Reviews** — 1 review/order (completed orders only), dimension ratings from category config, partner rating recomputed from aggregates
 - **Favorites** — DB-unique toggle for services & providers, favorites page
-- **Request for Quotation (RFQ)** — publishing wizard + photo attachments, deadline, visibility (public/invited), compare & accept quotations (versioned, immutable approval)
+- **Request for Quotation (RFQ)** — publishing wizard + photo attachments, deadline, visibility (public/invited), compare & accept quotations (versioned, immutable approval), then **order directly from the approved quotation** (survey→quotation→order path)
 - **Project Marketplace** — publish projects, receive proposals, shortlist/award, two-party contracts, milestones: fund → work → revision → approve → **release + automatic ledger posting**
 - **Chat** — per-order & direct conversations, idempotent (`client_message_id`), read receipts, attachments, polling fallback (broadcast-ready)
 - **Notifications** — notification center, unread count, per-event×channel preferences, critical-event policy
@@ -95,7 +95,7 @@ A complete *service commerce* platform: a marketplace for home services, profess
 - **Recurring services** — weekly/monthly schedules, idempotent occurrence materialization
 - **Promotions & vouchers** — percent/fixed types, max discount, min spend, usage/per-user limits, first-order-only, stackable, vendor share
 - **Referrals** — deterministic codes, qualification, rewards
-- **Membership** — plans (schema live; billing cycle to follow)
+- **Membership** — plans + full billing cycle: subscribe → invoice order (`TYPE_MEMBERSHIP`, never settles/commissions) → paid via payment pipeline → active window; renew extends from the current window end, plan switch supersedes, cancel + daily expiry sweeper
 
 ### 8. AI (advisory-only)
 
@@ -109,6 +109,7 @@ A complete *service commerce* platform: a marketplace for home services, profess
 - **Audit log** — actor, before/after, IP, user-agent for sensitive actions
 - **Location** — Indonesia location tree (country→subdistrict), 15 provinces / 33 cities seeded, customer addresses with lat/lng
 - **Search & Geo abstraction** — `SearchProviderInterface`, `GeoServiceInterface` (haversine + radius filter)
+- **Programmatic SEO** — category×city landing pages `/jasa/{category}/{city}` from `seo_metadata` (h1/intro/canonical/noindex per row), cached `sitemap.xml` (categories × 33 cities + active services, chunked), `robots.txt` with sitemap reference
 - **Media** — `MediaService` (real MIME + magic bytes + size cap), `service-image` component with a category-icon fallback
 - **PWA** — manifest + service worker (static-only cache; API/admin network-only), installable
 - **Health & observability** — `/api/v1/health` (DB+Redis) + `/up`, structured logs
@@ -196,13 +197,15 @@ php artisan test
 npm run build   # frontend (Vite)
 ```
 
-168 tests / 5,900+ assertions covering: unit (Money/TOTP/pricing/availability/finance invariants), feature (auth/RBAC/partner/catalog/order/payment/chat/notif), the **demo dataset** (media integrity, service distribution, financial invariants), and critical **E2E** flows:
+**179 tests / 6,000+ assertions** covering: unit (Money/TOTP/pricing/availability/finance invariants), feature (auth/RBAC/partner/catalog/order/payment/chat/notif), the **demo dataset** (media integrity, service distribution, financial invariants), and critical **E2E** flows:
 
 - **Home Service (§126)**: search → book → pay → dispatch → accept → OTP check-in → evidence → additional charge → complete ✓
 - **Project (§127)**: post → proposal → shortlist → award → contract → milestone funding → revision → approval → **release + ledger** ✓
 - **Corporate**: request → two-level approval → order conversion (PO ref preserved) ✓
 - **Dispute**: settled order → dispute → evidence → officer → full refund → ledger balanced ✓
 - **Financial invariants (§54/§128)**: balanced ledger, double-settle/refund/withdrawal blocked, refund ≤ paid, webhook dedup ✓
+- **Quotation → order**: approved quotation converts exactly once into a pending_payment order ✓
+- **Membership billing**: subscribe/renew/cancel/expiry with sandbox-paid invoices ✓
 
 ---
 
@@ -223,7 +226,7 @@ Admin seed: `admin@jasapedia.test / password` — **change it in production**.
 
 ## Status & Known Gaps
 
-Live details: `IMPLEMENTATION_STATUS.md` + `FINAL_AUDIT.md`. Open gaps: membership billing cycle, custom offers in chat, Reverb realtime (polling fallback active), Meilisearch activation, quotation → service order conversion, browser E2E (Playwright), programmatic SEO Blade landing pages.
+Live details: `IMPLEMENTATION_STATUS.md` + `FINAL_AUDIT.md`. Open gaps: custom offers in chat, Reverb realtime (polling fallback active), Meilisearch activation, browser E2E (Playwright), load testing.
 
 ## Documentation
 
